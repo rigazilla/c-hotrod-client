@@ -62,8 +62,23 @@ void destroyCtx(void *ptr) {
 struct char_buffer put(void *v_ctx, struct char_buffer key, struct char_buffer value) {
    struct context *ctx = (struct context*)v_ctx;
    std::vector<char> k(key.buf, key.buf+key.count);
-   std::vector<char> v(value.buf, value.buf+key.count);
+   std::vector<char> v(value.buf, value.buf+value.count);
    std::vector<char>* retVec = ctx->cache->put(k,v);
+   char_buffer ret = { nullptr, 0} ;
+   if (retVec)
+   {
+       ret.count = retVec->size();
+       ret.buf = new char[ret.count];
+       std::copy(retVec->begin(), retVec->end(), ret.buf);
+       delete retVec;
+   }
+   return ret;
+}
+
+struct char_buffer get(void *v_ctx, struct char_buffer key) {
+   struct context *ctx = (struct context*)v_ctx;
+   std::vector<char> k(key.buf, key.buf+key.count);
+   std::vector<char>* retVec = ctx->cache->get(k);
    char_buffer ret = { nullptr, 0} ;
    if (retVec)
    {
